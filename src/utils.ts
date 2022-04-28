@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 
-import { BASE_META_KEY } from "./consts"
+import { BASE_META_KEY, META_KEY } from "./consts"
+import { ClassType } from './types';
 
 type ArgsFn = (...args: any) => void;
 type ArgsAct<T> = (...args: any) => T;
@@ -49,4 +50,17 @@ export function doOnce<T>(fn: Arg0Act<T>): T {
     return res;
 }
 
+export function paramTypes(target: Function, propertyKey?: string): ClassType[] {
+    if (propertyKey) {
+        return Reflect.getMetadata(BASE_META_KEY.paramtypes, target, propertyKey);
+    } else {
+        return Reflect.getMetadata(BASE_META_KEY.paramtypes, target);
+    }
+}
 
+export function Provider(options?: any): ClassDecorator {
+    options = options || {};
+    return (target) => {
+        Reflect.defineMetadata(META_KEY.svc, options, target);
+    };
+}

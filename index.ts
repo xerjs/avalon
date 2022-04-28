@@ -1,1 +1,2 @@
-export * as avalon from "./src/avalon"
+import "reflect-metadata"
+export * from "./src"
