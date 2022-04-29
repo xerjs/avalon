@@ -4,9 +4,14 @@ export const BASE_META_KEY = {
     returntype: "design:returntype",
 };
 
+const perfix = "avalon:svc";
+
 export const META_KEY = {
-    svc: "avalon:class",
-    ctx: "ctx:module",
-    property: "svc:property:%s",
-    par: "par:%d",
+    svc: perfix,
+    property: (propertyKey: string) => {
+        return perfix + ":property:" + propertyKey;
+    },
+    param: (po: number) => {
+        return perfix + ":par:" + po;
+    }
 } as const;
