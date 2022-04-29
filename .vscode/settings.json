@@ -1,0 +1,8 @@
+{
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "typescript.format.semicolons": "insert",
+    "typescript.preferences.quoteStyle": "double",
+    "eslint.alwaysShowStatus": true,
+    "eslint.codeActionsOnSave.mode": "all"
+}
