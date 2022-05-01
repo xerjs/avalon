@@ -1,6 +1,6 @@
 {
   "name": "@xerjs/avalon",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "ioc implement",
   "main": "src/index.js",
   "engines": {
@@ -25,9 +25,25 @@
   },
   "scripts": {
     "ts": "ts-node",
-    "build": "tsc -p ./tsconfig-build.json",
+    "build": "tsc -p ./tsconfig-build.json && cp package.json build",
+    "bx": "rm -rf build",
     "test": "mocha -r ./node_modules/ts-node/register tests/**/*.spec.ts"
   },
-  "author": "",
-  "license": "MIT"
+  "author": "lusionx",
+  "license": "MIT",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xerjs/avalon.git"
+  },
+  "keywords": [
+    "ioc",
+    "container"
+  ],
+  "bugs": {
+    "url": "https://github.com/xerjs/avalon/issues"
+  },
+  "homepage": "https://github.com/xerjs/avalon#readme"
 }
