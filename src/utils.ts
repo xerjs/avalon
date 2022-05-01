@@ -5,11 +5,15 @@ import { BASE_META_KEY, META_KEY } from "./consts";
 import { ClassType, Ioc } from "./types";
 
 
-export function paramTypes(target: Function, propertyKey?: string): ClassType[] {
+export function paramTypes(target: object, propertyKey?: string): ClassType[] {
     if (propertyKey) {
         return Reflect.getMetadata(BASE_META_KEY.paramtypes, target, propertyKey);
     }
     return Reflect.getMetadata(BASE_META_KEY.paramtypes, target);
+}
+
+export function designType(target: object, propertyKey: string): ClassType {
+    return Reflect.getMetadata(BASE_META_KEY.type, target, propertyKey);
 }
 
 /* eslint-disable @typescript-eslint/naming-convention */

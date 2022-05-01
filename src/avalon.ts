@@ -2,13 +2,17 @@ import "reflect-metadata";
 import * as assert from "assert";
 import { ClassType, Ioc, PropertyMeta } from "./types";
 import { BASE_META_KEY, META_KEY } from "./consts";
-import { paramTypes } from "./utils";
+import { designType, paramTypes } from "./utils";
 
+const unFill = -1;
 
 export class Avalon implements Ioc {
     private pool: Map<ClassType, any>;
     constructor() {
-        this.pool = new Map();
+        const mm = new Map();
+        mm.set(Number, 0);
+        mm.set(String, "");
+        this.pool = mm;
     }
     resolve<T>(constructor: ClassType<T>): T {
         return this.pool.get(constructor);
@@ -27,7 +31,7 @@ export class Avalon implements Ioc {
     private createInstances() {
         for (const ctr of this.pool.keys()) {
             const fns = paramTypes(ctr);
-            if (fns.length === 0) {
+            if (!fns || fns.length === 0) {
                 // 无参数的构造函数
                 this.pool.set(ctr, new ctr());
             }
@@ -35,7 +39,7 @@ export class Avalon implements Ioc {
         do {
             let goon = false;
             for (const [ctr, v] of this.pool.entries()) {
-                if (v) continue; // 已经初始化过了
+                if (v !== unFill) continue; // 已经初始化过了
                 const pars = paramTypes(ctr).map(fn => this.pool.get(fn));
                 if (pars.every(e => e)) {
                     this.pool.set(ctr, new ctr(...pars));
@@ -59,7 +63,7 @@ export class Avalon implements Ioc {
         const deps: ClassType[] = [];
         const size = this.pool.size;
         for (const ctr of servs) {
-            this.pool.set(ctr, 0);
+            this.pool.set(ctr, unFill);
             const fns = paramTypes(ctr);
             if (!fns) continue; // no constructor
             deps.push(...fns);
@@ -95,11 +99,7 @@ export class Avalon implements Ioc {
             const pkeys = Reflect.getMetadataKeys(ctr.prototype) || [];
             for (const pk of pkeys) {
                 const pAttr: PropertyMeta = Reflect.getMetadata(pk, ctr.prototype);
-                const ptype = Reflect.getMetadata(
-                    BASE_META_KEY.type,
-                    ctr.prototype,
-                    pAttr.key,
-                );
+                const ptype = designType(ctr.prototype, pAttr.key);
                 if (pAttr.svc) {
                     const bases = cecProto(pAttr.svc.prototype);
                     const exts = bases.find(e => e === ptype.prototype);
