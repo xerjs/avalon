@@ -1,6 +1,6 @@
 {
   "name": "@xerjs/avalon",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "ioc implement",
   "main": "src/index.js",
   "engines": {

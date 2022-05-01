@@ -20,6 +20,10 @@ export class Avalon implements Ioc {
         this.injectProperty();
     }
 
+    protected get allClass(): IterableIterator<ClassType> {
+        return this.pool.keys();
+    }
+
     private createInstances() {
         for (const ctr of this.pool.keys()) {
             const fns = paramTypes(ctr);
