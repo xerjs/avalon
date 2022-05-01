@@ -1,10 +1,7 @@
-
 import { assert } from "chai";
-import { Avalon } from "../src";
-import { Serve, Serve2, Config, ImpCfg } from "./def";
+import { Serve, Serve2, Config, ImpCfg, avalon } from "./def";
 
 describe("resolve instance", () => {
-    let avalon = new Avalon();
 
     before(() => {
         avalon.initialize([Serve2]);

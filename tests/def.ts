@@ -1,5 +1,7 @@
-import { Provider } from "../src";
-import { Inject } from "../src/utils";
+import { Provider, Inject, Avalon } from "../src";
+
+export const avalon = new Avalon();
+
 const cfgVal = require("./cfg.json");
 
 interface Cfg {
