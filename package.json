@@ -1,6 +1,6 @@
 {
   "name": "@xerjs/avalon",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "ioc implement",
   "main": "src/index.js",
   "engines": {
@@ -31,8 +31,11 @@
   },
   "author": "lusionx",
   "license": "MIT",
+  "files": [
+    "src/"
+  ],
   "directories": {
-    "test": "tests"
+    "test": "tests/"
   },
   "repository": {
     "type": "git",

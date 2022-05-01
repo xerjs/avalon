@@ -61,6 +61,7 @@ export class Avalon implements Ioc {
         for (const ctr of servs) {
             this.pool.set(ctr, 0);
             const fns = paramTypes(ctr);
+            if (!fns) continue; // no constructor
             deps.push(...fns);
 
             const { ext } = Reflect.getMetadata(META_KEY.svc, ctr);
