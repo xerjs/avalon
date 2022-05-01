@@ -1,17 +1,9 @@
 import "reflect-metadata";
 import * as assert from "assert";
-import { ClassType } from "./types";
+import { ClassType, Ioc, PropertyMeta } from "./types";
 import { BASE_META_KEY, META_KEY } from "./consts";
 import { paramTypes } from "./utils";
 
-export interface Ioc {
-    resolve<T>(ctr: ClassType<T>): T;
-}
-
-export interface PropertyMeta {
-    id?: ClassType;
-    key: string;
-}
 
 export class Avalon implements Ioc {
     private pool: Map<ClassType, any>;
@@ -75,8 +67,8 @@ export class Avalon implements Ioc {
             const pkeys = Reflect.getMetadataKeys(ctr.prototype);
             for (const pk of pkeys) {
                 const pAttr: PropertyMeta = Reflect.getMetadata(pk, ctr.prototype);
-                if (pAttr.id) {
-                    deps.push(pAttr.id);
+                if (pAttr.svc) {
+                    deps.push(pAttr.svc);
                 }
             }
 
@@ -103,12 +95,12 @@ export class Avalon implements Ioc {
                     ctr.prototype,
                     pAttr.key,
                 );
-                if (pAttr.id) {
-                    const bases = cecProto(pAttr.id.prototype);
+                if (pAttr.svc) {
+                    const bases = cecProto(pAttr.svc.prototype);
                     const exts = bases.find(e => e === ptype.prototype);
-                    assert.ok(exts, `[class ${pAttr.id.name}] not extends [class ${ptype.name}]`);
+                    assert.ok(exts, `[class ${pAttr.svc.name}] not extends [class ${ptype.name}]`);
                 }
-                Object.assign(inst, { [pAttr.key]: this.pool.get(pAttr.id || ptype) });
+                Object.assign(inst, { [pAttr.key]: this.pool.get(pAttr.svc || ptype) });
             }
         }
     }
