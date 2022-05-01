@@ -1,25 +1,31 @@
 import "reflect-metadata";
+import * as assert from "assert";
 import { ClassType } from "./types";
-import { META_KEY } from "./consts";
+import { BASE_META_KEY, META_KEY } from "./consts";
 import { paramTypes } from "./utils";
 
 export interface Ioc {
     resolve<T>(ctr: ClassType<T>): T;
 }
 
-export class Avaion implements Ioc {
+export interface PropertyMeta {
+    id?: ClassType;
+    key: string;
+}
+
+export class Avalon implements Ioc {
     private pool: Map<ClassType, any>;
     constructor() {
         this.pool = new Map();
     }
     resolve<T>(constructor: ClassType<T>): T {
-        const instance = this.pool.get(constructor) as T;
-        return instance;
+        return this.pool.get(constructor);
     }
 
     initialize<T extends ClassType>(servs: T[]) {
         this.fillPool(servs, 0);
         this.createInstances();
+        this.injectProperty();
     }
 
     private createInstances() {
@@ -48,19 +54,66 @@ export class Avaion implements Ioc {
 
     }
 
+    /**
+     * 填充pool里的key
+     * @param servs
+     * @param deep
+     */
     private fillPool<T extends ClassType>(servs: T[], deep: number) {
         const deps: ClassType[] = [];
+        const size = this.pool.size;
         for (const ctr of servs) {
             this.pool.set(ctr, 0);
             const fns = paramTypes(ctr);
             deps.push(...fns);
+
+            const { ext } = Reflect.getMetadata(META_KEY.svc, ctr);
+            if (ext) {
+                deps.push(ext);
+            }
+
+            const pkeys = Reflect.getMetadataKeys(ctr.prototype);
+            for (const pk of pkeys) {
+                const pAttr: PropertyMeta = Reflect.getMetadata(pk, ctr.prototype);
+                if (pAttr.id) {
+                    deps.push(pAttr.id);
+                }
+            }
+
+            if (deps.length && size < this.pool.size) {
+                this.fillPool(deps, deep + 1);
+            }
         }
-        if (deps.length) {
-            this.fillPool(deps, deep + 1);
+    }
+
+    private injectProperty() {
+        function cecProto(prototype: any): unknown[] {
+            const v = prototype.__proto__;
+            if (v) {
+                return [v, ...cecProto(v)];
+            }
+            return [];
+        }
+        for (const [ctr, inst] of this.pool) {
+            const pkeys = Reflect.getMetadataKeys(ctr.prototype) || [];
+            for (const pk of pkeys) {
+                const pAttr: PropertyMeta = Reflect.getMetadata(pk, ctr.prototype);
+                const ptype = Reflect.getMetadata(
+                    BASE_META_KEY.type,
+                    ctr.prototype,
+                    pAttr.key,
+                );
+                if (pAttr.id) {
+                    const bases = cecProto(pAttr.id.prototype);
+                    const exts = bases.find(e => e === ptype.prototype);
+                    assert.ok(exts, `[class ${pAttr.id.name}] not extends [class ${ptype.name}]`);
+                }
+                Object.assign(inst, { [pAttr.key]: this.pool.get(pAttr.id || ptype) });
+            }
         }
     }
 }
 
-export const SingleAvalon = new Avaion();
+export const SingleAvalon = new Avalon();
 
 

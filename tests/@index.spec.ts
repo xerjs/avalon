@@ -1,23 +1,23 @@
-import "reflect-metadata"
+import "reflect-metadata";
 
-import { Provider, paramTypes } from "../index"
+import { Provider, paramTypes } from "../src";
 
 @Provider()
 class Some {
-    constructor(){        
-    }    
+    constructor() {
+    }
 }
 
 @Provider()
 class Some1 {
-    constructor(public ss: Some){        
-    }    
+    constructor(public ss: Some) {
+    }
 }
 
 
-function main() {    
-    console.log(paramTypes(Some))
-    console.log(paramTypes(Some1))
+function main() {
+    console.log(paramTypes(Some));
+    console.log(paramTypes(Some1));
 }
 
 // process.nextTick(main)
