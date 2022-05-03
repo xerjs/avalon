@@ -37,3 +37,19 @@ export function Inject(svc?: ClassType): PropertyDecorator {
         Reflect.defineMetadata(k, { svc, key }, target); // target 指向 class.prototype
     };
 }
+
+/**
+ * 洗牌算法
+ * @param len 数组长度
+ * @returns 洗后的数组下标 0 ~ len-1
+ */
+export function shuffArr(len: number): number[] {
+    const arr = "1".repeat(len).split("").map((e, i) => i);
+    let cut = arr.length;
+    while (cut) {
+        const idx = Math.floor(Math.random() * cut);
+        [arr[cut - 1], arr[idx]] = [arr[idx], arr[cut - 1]];
+        cut--;
+    }
+    return arr;
+}
