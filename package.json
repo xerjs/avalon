@@ -27,7 +27,7 @@
     "ts": "ts-node",
     "build": "tsc -p ./tsconfig-build.json && cp package.json build",
     "bx": "rm -rf build",
-    "test": "mocha -r ./node_modules/ts-node/register tests/**/*.spec.ts"
+    "test": "mocha -r ./node_modules/ts-node/register tests/index.ts"
   },
   "author": "lusionx",
   "license": "MIT",

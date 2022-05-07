@@ -1,9 +1,10 @@
 import { assert } from "chai";
-import { once, onceOn, sleep } from "../src";
-
-
+import { actionOn, actionErr, once, onceOn, sleep } from "../src";
+export { actionOn, actionErr };
 
 describe("utils Decorator tests", () => {
+
+    require("./utils/action.spec");
 
     class Person {
         constructor(public age: number = 1) {
@@ -31,15 +32,15 @@ describe("utils Decorator tests", () => {
         }
     }
 
-    it("Decorator once", async () => {
+
+
+    it("Decorator once", () => {
         const p = new Person();
         const pres = p.say(22);
 
-        await sleep(200);
         const p2 = new Person();
         const p2res = p2.say(33);
 
-        await sleep(100);
         assert.equal(pres, p2res);
 
         assert.equal(pres, p.say(22));
@@ -49,7 +50,7 @@ describe("utils Decorator tests", () => {
         assert.equal(p2res, p.say(24));
     });
 
-    it("Decorator onceOn", async () => {
+    it("Decorator onceOn", () => {
         const p = new Person(1);
         const pres = p.sayOn(22);
         assert.equal(pres, p.sayOn(33));
