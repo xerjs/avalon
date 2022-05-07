@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import { Serve, Serve2, Config, ImpCfg, avalon } from "./def";
+import { Serve, Serve2, Config, ImpCfg, avalon, ImpImpCfg } from "./def";
 
 describe("resolve instance", () => {
 
@@ -32,5 +32,9 @@ describe("resolve instance", () => {
         assert.ok(s1);
         assert.ok(s1.cfg);
         assert.ok(s1.cfg instanceof ImpCfg);
+
+        assert.ok(s1.cfg1 instanceof ImpImpCfg);
+
+        assert.ok(s1.cfg2 instanceof ImpImpCfg);
     });
 });

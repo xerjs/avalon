@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import * as assert from "assert";
-import { ClassType, Ioc, PropertyMeta } from "./types";
+import { ClassType, Ioc, PropertyMeta, ProviderOptions } from "./types";
 import { BASE_META_KEY, META_KEY } from "./consts";
 import { designType, paramTypes } from "./utils";
 
@@ -8,11 +8,13 @@ const unFill = -1;
 
 export class Avalon implements Ioc {
     private pool: Map<ClassType, any>;
+    private namedPool: Map<string, ClassType>;
     constructor() {
         const mm = new Map();
         mm.set(Number, 0);
         mm.set(String, "");
         this.pool = mm;
+        this.namedPool = new Map();
     }
     resolve<T>(constructor: ClassType<T>): T {
         return this.pool.get(constructor);
@@ -21,7 +23,17 @@ export class Avalon implements Ioc {
     initialize<T extends ClassType>(servs: T[]) {
         this.fillPool(servs, 0);
         this.createInstances();
+        this.fillNamedPool();
         this.injectProperty();
+    }
+
+    private fillNamedPool() {
+        for (const [ctr] of this.pool) { // ctr is class
+            const meta: { id: string; } = Reflect.getMetadata(META_KEY.svc, ctr);
+            if (meta?.id && typeof meta.id === "string") {
+                this.namedPool.set(meta.id, ctr);
+            }
+        }
     }
 
     protected get allClass(): IterableIterator<ClassType> {
@@ -66,17 +78,19 @@ export class Avalon implements Ioc {
             this.pool.set(ctr, unFill);
             const fns = paramTypes(ctr);
             if (!fns) continue; // no constructor
-            deps.push(...fns);
+            deps.push(...fns); // deps on constructor
 
-            const { ext } = Reflect.getMetadata(META_KEY.svc, ctr);
-            if (ext) {
-                deps.push(ext);
+            const cfg: ProviderOptions = Reflect.getMetadata(META_KEY.svc, ctr);
+            if (cfg?.deps) {
+                deps.push(...cfg.deps);
             }
 
-            const pkeys = Reflect.getMetadataKeys(ctr.prototype);
-            for (const pk of pkeys) {
-                const pAttr: PropertyMeta = Reflect.getMetadata(pk, ctr.prototype);
-                if (pAttr.svc) {
+            const mkeys = Reflect.getMetadataKeys(ctr.prototype);
+            for (const mk of mkeys) {
+                const propertyKey = META_KEY.propertyMatch(mk);
+                if (!propertyKey) continue;
+                const pAttr: PropertyMeta = Reflect.getMetadata(mk, ctr.prototype);
+                if (pAttr.svc && typeof pAttr.svc === "function") {
                     deps.push(pAttr.svc);
                 }
             }
@@ -88,24 +102,29 @@ export class Avalon implements Ioc {
     }
 
     private injectProperty() {
-        function cecProto(prototype: any): unknown[] {
+        function recProto(prototype: any): unknown[] {
             const v = prototype.__proto__;
             if (v) {
-                return [v, ...cecProto(v)];
+                return [v, ...recProto(v)];
             }
             return [];
         }
         for (const [ctr, inst] of this.pool) {
-            const pkeys = Reflect.getMetadataKeys(ctr.prototype) || [];
-            for (const pk of pkeys) {
-                const pAttr: PropertyMeta = Reflect.getMetadata(pk, ctr.prototype);
-                const ptype = designType(ctr.prototype, pAttr.key);
-                if (pAttr.svc) {
-                    const bases = cecProto(pAttr.svc.prototype);
-                    const exts = bases.find(e => e === ptype.prototype);
-                    assert.ok(exts, `[class ${pAttr.svc.name}] not extends [class ${ptype.name}]`);
+            const mkeys = Reflect.getMetadataKeys(ctr.prototype) || [];
+            for (const mk of mkeys) {
+                const meta: PropertyMeta = Reflect.getMetadata(mk, ctr.prototype);
+                const ptype = designType(ctr.prototype, meta.key); // 默认returntype
+                if (typeof meta.svc === "string") {
+                    const type = this.namedPool.get(meta.svc);
+                    assert.ok(type, `miss [${meta.svc}] class `);
+                    meta.svc = type;
                 }
-                Object.assign(inst, { [pAttr.key]: this.pool.get(pAttr.svc || ptype) });
+                if (meta.svc) { // 可配置的子类
+                    const bases = recProto(meta.svc.prototype);
+                    const exts = bases.find(e => e === ptype.prototype);
+                    assert.ok(exts, `[class ${meta.svc.name}] not extends [class ${ptype.name}]`);
+                }
+                Object.assign(inst, { [meta.key]: this.pool.get(meta.svc || ptype) });
             }
         }
     }

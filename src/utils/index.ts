@@ -7,7 +7,7 @@ import "reflect-metadata";
 import { SingleAvalon } from "../avalon";
 
 import { BASE_META_KEY, META_KEY, } from "../consts";
-import { ClassType, Ioc } from "../types";
+import { ClassType, Ioc, ProviderOptions } from "../types";
 
 
 export function paramTypes(target: object, propertyKey?: string): ClassType[] {
@@ -21,7 +21,7 @@ export function designType(target: object, propertyKey: string): ClassType {
     return Reflect.getMetadata(BASE_META_KEY.type, target, propertyKey);
 }
 
-export function Provider(options?: { ioc?: Ioc, ext?: ClassType; }): ClassDecorator {
+export function Provider(options?: ProviderOptions): ClassDecorator {
     options = options || {};
     const def = { ioc: SingleAvalon };
     return (target) => {
@@ -35,7 +35,7 @@ export function Provider(options?: { ioc?: Ioc, ext?: ClassType; }): ClassDecora
  * 只有解决循环依赖/子类实现时才使用属性注入
  * @param svc 指向属性 type 的子类, 实现替换
  */
-export function Inject(svc?: ClassType): PropertyDecorator {
+export function Inject(svc?: ClassType | string): PropertyDecorator {
     return (target: Object, key: string | symbol) => {
         const k = META_KEY.property(key as string);
         Reflect.defineMetadata(k, { svc, key }, target); // target 指向 class.prototype

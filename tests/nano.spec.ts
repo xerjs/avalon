@@ -6,7 +6,7 @@ function splitId(b48: string) {
 }
 
 describe("nano tests", () => {
-    it("servClass", () => {
+    it("id test", () => {
         const id1 = singleNano.newId();
         assert.ok(id1);
         const id2 = singleNano.newId();

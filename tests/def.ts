@@ -37,12 +37,12 @@ export class DataBase {
 export class ImpCfg extends Config {
 
 }
-
+@Provider({ id: "ImpImpCfg" })
 export class ImpImpCfg extends ImpCfg {
 
 }
 
-@Provider()
+@Provider({ deps: [ImpImpCfg] })
 export class Serve {
     constructor(public db: DataBase) {
 
@@ -57,7 +57,10 @@ export class Serve {
     @Inject(ImpCfg)
     cfg!: Config;
 
-    @Inject(ImpImpCfg)
+    @Inject()
+    cfg1!: ImpImpCfg;
+
+    @Inject("ImpImpCfg")
     cfg2!: Config;
 
     getNum() {
@@ -65,7 +68,7 @@ export class Serve {
     }
 }
 
-@Provider({ ext: Serve })
+@Provider({ deps: [Serve] })
 export class Serve2 extends Serve {
     constructor(db: DataBase) {
         super(db);
