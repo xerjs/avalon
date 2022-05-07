@@ -15,3 +15,9 @@ export const META_KEY = {
         return perfix + ":par:" + po;
     }
 } as const;
+
+
+export const ONCE_MKEY = {
+    res: "once:res",
+    ttl: "once:ttl",
+};

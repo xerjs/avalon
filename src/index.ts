@@ -1,5 +1,8 @@
 import "reflect-metadata";
+
 export * from "./avalon";
-export { Provider, paramTypes, Inject, designType } from "./utils";
+export * from "./utils";
 export { ClassType } from "./types";
 export * from "./nano";
+
+
