@@ -42,22 +42,6 @@ export function Inject(svc?: ClassType | string): PropertyDecorator {
     };
 }
 
-export function action(opt: any): MethodDecorator {
-    return <M>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<M>) => {
-        const pkey = propertyKey as string;
-        const method = descriptor.value;
-        if (!method || typeof method !== "function") throw new Error(`property ${pkey} isnt function`);
-
-        if (opt && typeof opt === "object") {
-            for (const opK of Object.keys(opt)) {
-                Reflect.defineMetadata(opK, opt[opK], target, pkey);
-            }
-        }
-        return descriptor;
-    };
-}
-
-
 /**
  * 生成序列
  */

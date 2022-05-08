@@ -20,6 +20,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-no-null": "^1.0.2",
     "mocha": "^9.2.2",
+    "nyc": "^15.1.0",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3"
   },
@@ -27,6 +28,7 @@
     "ts": "ts-node",
     "build": "tsc -p ./tsconfig-build.json && cp package.json build",
     "bx": "rm -rf build",
+    "coverage": "nyc npm run test",
     "test": "mocha -r ./node_modules/ts-node/register tests/index.ts"
   },
   "author": "lusionx",
