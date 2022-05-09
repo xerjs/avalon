@@ -2,7 +2,7 @@
  * method 拦截器 Interceptor
  */
 
-import { ONCE_MKEY } from "../consts";
+import { ONCE_MKEY, META_KEY } from "../consts";
 
 export function action(opt: any): MethodDecorator {
     return <M>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<M>) => {
@@ -12,7 +12,7 @@ export function action(opt: any): MethodDecorator {
 
         if (opt && typeof opt === "object") {
             for (const opK of Object.keys(opt)) {
-                Reflect.defineMetadata(opK, opt[opK], target, pkey);
+                Reflect.defineMetadata(META_KEY.action(opK), opt[opK], target, pkey);
             }
         }
         return descriptor;
