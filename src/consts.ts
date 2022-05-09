@@ -18,9 +18,6 @@ export const META_KEY = {
             return m[1];
         }
     },
-    action: (propertyKey: string) => {
-        return perfix + ":action:" + propertyKey;
-    },
     param: (po: number) => {
         return perfix + ":par:" + po;
     }

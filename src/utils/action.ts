@@ -4,16 +4,49 @@
 
 import { ONCE_MKEY, META_KEY } from "../consts";
 
-export function action(opt: any): MethodDecorator {
+export class MetaRule {
+    constructor(public readonly perfix: string, public readonly key: string) {
+    }
+
+    metaKey(propertyKey: string): string {
+        return [this.perfix, this.key, propertyKey].join(":");
+    }
+
+    propertyKey(metaKey: string): string | undefined {
+        const re = new RegExp(this.perfix + `:${this.key}:(\\w+)`);
+        const m = re.exec(metaKey);
+        if (m) {
+            return m[1];
+        }
+    }
+
+    getMetadata<T>(target: object, valD?: T): T | undefined {
+        return Reflect.getMetadata(this.perfix, target) || valD;
+    }
+}
+
+function addProperty(target: Object, rule: MetaRule, propertyKey?: string): string[] {
+    const vals: string[] = Reflect.getMetadata(rule.perfix, target) || [];
+    if (!propertyKey) {
+        return vals;
+    }
+    if (vals.includes(propertyKey)) {
+        return vals;
+    }
+    vals.push(propertyKey);
+    Reflect.defineMetadata(rule.perfix, vals, target);
+    return vals;
+}
+
+export function action(opt: any, rule: MetaRule): MethodDecorator {
     return <M>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<M>) => {
         const pkey = propertyKey as string;
         const method = descriptor.value;
         if (!method || typeof method !== "function") throw new Error(`property ${pkey} isnt function`);
 
         if (opt && typeof opt === "object") {
-            for (const opK of Object.keys(opt)) {
-                Reflect.defineMetadata(META_KEY.action(opK), opt[opK], target, pkey);
-            }
+            addProperty(target, rule, pkey);
+            Reflect.defineMetadata(rule.metaKey(pkey), opt, target, pkey);
         }
         return descriptor;
     };

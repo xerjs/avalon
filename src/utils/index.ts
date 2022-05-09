@@ -9,7 +9,6 @@ import { SingleAvalon } from "../avalon";
 import { BASE_META_KEY, META_KEY, } from "../consts";
 import { ClassType, Ioc, ProviderOptions } from "../types";
 
-
 export function paramTypes(target: object, propertyKey?: string): ClassType[] {
     if (propertyKey) {
         return Reflect.getMetadata(BASE_META_KEY.paramtypes, target, propertyKey);
