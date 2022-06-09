@@ -1,15 +1,18 @@
 import "reflect-metadata";
 import * as assert from "assert";
 import { ClassType, Ioc, PropertyMeta, ProviderOptions } from "./types";
-import { BASE_META_KEY, META_KEY } from "./consts";
-import { designType, paramTypes } from "./utils";
+import { META_KEY } from "./consts";
+import { designType, MetaRule, paramTypes } from "./utils";
 
 const unFill = -1;
 
 export class Avalon implements Ioc {
     private pool: Map<ClassType, any>;
+    private rule: MetaRule;
+
     private namedPool: Map<string, ClassType>;
     constructor() {
+        this.rule = new MetaRule(META_KEY.svc, META_KEY.property);
         const mm = new Map();
         mm.set(Number, 0);
         mm.set(String, "");
@@ -29,7 +32,7 @@ export class Avalon implements Ioc {
 
     private fillNamedPool() {
         for (const [ctr] of this.pool) { // ctr is class
-            const meta: { id: string; } = Reflect.getMetadata(META_KEY.svc, ctr);
+            const meta: { id: string; } = this.rule.getMetadata(ctr) as any;
             if (meta?.id && typeof meta.id === "string") {
                 this.namedPool.set(meta.id, ctr);
             }
@@ -80,14 +83,14 @@ export class Avalon implements Ioc {
             if (!fns) continue; // no constructor
             deps.push(...fns); // deps on constructor
 
-            const cfg: ProviderOptions = Reflect.getMetadata(META_KEY.svc, ctr);
+            const cfg: ProviderOptions | undefined = this.rule.getMetadata(ctr);
             if (cfg?.deps) {
                 deps.push(...cfg.deps);
             }
 
             const mkeys = Reflect.getMetadataKeys(ctr.prototype);
             for (const mk of mkeys) {
-                const propertyKey = META_KEY.propertyMatch(mk);
+                const propertyKey = this.rule.propertyKey(mk);
                 if (!propertyKey) continue;
                 const pAttr: PropertyMeta = Reflect.getMetadata(mk, ctr.prototype);
                 if (pAttr.svc && typeof pAttr.svc === "function") {

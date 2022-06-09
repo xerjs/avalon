@@ -1,7 +1,45 @@
 import { assert } from "chai";
-import { actionOn, actionErr } from "../utils.spec";
+import { MetaRule } from "../../src";
+import { actionOn, actionErr, action, actionArr } from "../utils.spec";
+
+const rule = new MetaRule("test:utils", "act");
+
+class TestAb {
+
+    @action({ a: 1 }, rule)
+    sayMa() {
+
+    }
+
+    @action({ b: 1 }, rule)
+    sayMb() {
+
+    }
+
+    @actionArr({ x: 1 }, rule)
+    @actionArr({ y: 1 }, rule)
+    say22() {
+
+    }
+}
 
 describe("utils action tests", () => {
+
+    it("action expect=ok", () => {
+        const target = TestAb.prototype;
+        const [a, b] = ["sayMa", "sayMb"];
+        assert.deepEqual(rule.getMetadata(target), [a, b, "say22"]);
+
+        assert.deepEqual(rule.propertyMeta(target, a), { a: 1 });
+        assert.deepEqual(rule.propertyMeta(target, b), { b: 1 });
+    });
+
+    it("actionArr expect=ok", () => {
+        const s22 = "say22";
+        const target = TestAb.prototype;
+        assert.deepEqual(rule.propertyMeta(target, s22), [{ y: 1 }, { x: 1 }]);
+    });
+
     it("actionOn expect=ok", () => {
         let i = 0;
         class Ab {
