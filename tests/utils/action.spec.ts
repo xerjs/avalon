@@ -37,7 +37,7 @@ describe("utils action tests", () => {
     it("actionArr expect=ok", () => {
         const s22 = "say22";
         const target = TestAb.prototype;
-        assert.deepEqual(rule.propertyMeta(target, s22), [{ x: 1 }, { y: 1 }]);
+        assert.deepEqual(rule.propertyMeta(target, s22), [{ y: 1 }, { x: 1 }]);
     });
 
     it("actionOn expect=ok", () => {
