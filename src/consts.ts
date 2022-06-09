@@ -8,16 +8,7 @@ const perfix = "avalon:svc";
 
 export const META_KEY = {
     svc: perfix,
-    property: (propertyKey: string) => {
-        return perfix + ":property:" + propertyKey;
-    },
-    propertyMatch: (longKey: string) => {
-        const re = new RegExp(perfix + ":property:(\\w+)");
-        const m = re.exec(longKey);
-        if (m) {
-            return m[1];
-        }
-    },
+    property: "property",
     param: (po: number) => {
         return perfix + ":par:" + po;
     }

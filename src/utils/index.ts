@@ -8,6 +8,7 @@ import { SingleAvalon } from "../avalon";
 
 import { BASE_META_KEY, META_KEY, } from "../consts";
 import { ClassType, Ioc, ProviderOptions } from "../types";
+import { MetaRule } from "./action";
 
 export function paramTypes(target: object, propertyKey?: string): ClassType[] {
     if (propertyKey) {
@@ -35,9 +36,10 @@ export function Provider(options?: ProviderOptions): ClassDecorator {
  * @param svc 指向属性 type 的子类, 实现替换
  */
 export function Inject(svc?: ClassType | string): PropertyDecorator {
+    const rule = new MetaRule(META_KEY.svc, META_KEY.property);
     return (target: Object, key: string | symbol) => {
-        const k = META_KEY.property(key as string);
-        Reflect.defineMetadata(k, { svc, key }, target); // target 指向 class.prototype
+        const mk = rule.metaKey(key as string);
+        Reflect.defineMetadata(mk, { svc, key }, target); // target 指向 class.prototype
     };
 }
 

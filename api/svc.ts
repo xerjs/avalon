@@ -1,6 +1,5 @@
 
-import { action, Avalon, ClassType, Provider, sleep } from "../src";
-import { MetaRule, META_KEY } from "../src/consts";
+import { action, Avalon, ClassType, MetaRule, Provider, sleep } from "../src";
 import Koa from "koa";
 import Router from "koa-router";
 
