@@ -20,11 +20,24 @@ export class MetaRule {
         }
     }
 
+    propertyMeta<T>(target: object, propertyKey: string): T | undefined {
+        return Reflect.getMetadata(this.metaKey(propertyKey), target, propertyKey);
+    }
+
     getMetadata<T>(target: object, valD?: T): T | undefined {
         return Reflect.getMetadata(this.perfix, target) || valD;
     }
+
+    arrMetadata<T>(target: object, propertyKey: string): T[] {
+        let rr: T[] = Reflect.getMetadata(this.metaKey(propertyKey), target, propertyKey);
+        if (rr) return rr;
+        rr = [];
+        Reflect.defineMetadata(this.metaKey(propertyKey), rr, target, propertyKey);
+        return rr;
+    }
 }
 
+/** 添加propertyKey到class.meta, 做为索引  */
 function addProperty(target: Object, rule: MetaRule, propertyKey?: string): string[] {
     const vals: string[] = Reflect.getMetadata(rule.perfix, target) || [];
     if (!propertyKey) {
@@ -37,7 +50,7 @@ function addProperty(target: Object, rule: MetaRule, propertyKey?: string): stri
     Reflect.defineMetadata(rule.perfix, vals, target);
     return vals;
 }
-
+/** 对method.meta做设置 */
 export function action(opt: any, rule: MetaRule): MethodDecorator {
     return <M>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<M>) => {
         const pkey = propertyKey as string;
@@ -47,6 +60,22 @@ export function action(opt: any, rule: MetaRule): MethodDecorator {
         if (opt && typeof opt === "object") {
             addProperty(target, rule, pkey);
             Reflect.defineMetadata(rule.metaKey(pkey), opt, target, pkey);
+        }
+        return descriptor;
+    };
+}
+
+/** 对method.meta设置Array值 */
+export function actionArr(opt: any, rule: MetaRule): MethodDecorator {
+    return <M>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<M>) => {
+        const pkey = propertyKey as string;
+        const method = descriptor.value;
+        if (!method || typeof method !== "function") throw new Error(`property ${pkey} isnt function`);
+
+        addProperty(target, rule, pkey);
+        const origin = rule.arrMetadata(target, pkey);
+        if (opt && typeof opt === "object") {
+            origin.push(opt);
         }
         return descriptor;
     };
