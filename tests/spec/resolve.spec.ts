@@ -1,8 +1,7 @@
 import { assert } from "chai";
-import { Serve, Serve2, Config, ImpCfg, avalon, ImpImpCfg } from "./def";
+import { Serve, Serve2, Config, ImpCfg, avalon, ImpImpCfg } from "../def";
 
 describe("resolve instance", () => {
-
     before(() => {
         avalon.initialize([Serve2]);
     });
@@ -11,7 +10,7 @@ describe("resolve instance", () => {
         assert.ok(avalon.resolve(Serve2));
         const cnf = avalon.resolve(Config);
         const s1 = avalon.resolve(Serve);
-        const i = cnf.db = 1;
+        const i = (cnf.db = 1);
         assert.equal(s1.getNum(), i);
     });
 

@@ -1,4 +1,3 @@
-
 import * as assert from "assert";
 import { shuffArr } from "./utils";
 
@@ -18,7 +17,7 @@ export class NaItem {
     newId(): string {
         const time = Math.floor(Date.now() / 1000) + this.skip; // 31bit
         const head = time.toString(2);
-        const ser = (this.from++) % MAX;
+        const ser = this.from++ % MAX;
         const end = ser.toString(2).padStart(13, "0");
         const byte6 = head + this.hid + end;
         assert.equal(byte6.length, 48);
@@ -41,6 +40,5 @@ export class Nano {
         this.cur = this.cur % this.instances;
         return item.newId();
     }
+    static instance = new Nano();
 }
-
-export const singleNano = new Nano();

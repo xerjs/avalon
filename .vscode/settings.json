@@ -1,8 +1,13 @@
 {
-    "editor.tabSize": 4,
     "editor.formatOnSave": true,
-    "typescript.format.semicolons": "insert",
-    "typescript.preferences.quoteStyle": "double",
-    "eslint.alwaysShowStatus": true,
-    "eslint.codeActionsOnSave.mode": "all"
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true
+    },
+    "prettier.trailingComma": "all",
+    "typescript.tsdk": "node_modules/typescript/lib"
 }

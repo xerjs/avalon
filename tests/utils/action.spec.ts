@@ -1,30 +1,22 @@
 import { assert } from "chai";
 import { MetaRule } from "../../src";
-import { actionOn, actionErr, action, actionArr } from "../utils.spec";
+import { actionOn, actionErr, action, actionArr } from "../../src/utils";
 
 const rule = new MetaRule("test:utils", "act");
 
 class TestAb {
-
     @action({ a: 1 }, rule)
-    sayMa() {
-
-    }
+    sayMa() {}
 
     @action({ b: 1 }, rule)
-    sayMb() {
-
-    }
+    sayMb() {}
 
     @actionArr({ x: 1 }, rule)
     @actionArr({ y: 1 }, rule)
-    say22() {
-
-    }
+    say22() {}
 }
 
 describe("utils action tests", () => {
-
     it("action expect=ok", () => {
         const target = TestAb.prototype;
         const [a, b] = ["sayMa", "sayMb"];
@@ -55,7 +47,6 @@ describe("utils action tests", () => {
     });
 
     it("actionOn;input=err;expect=ok", () => {
-
         const fn = () => {
             throw new Error("stop");
         };
@@ -67,7 +58,7 @@ describe("utils action tests", () => {
         }
         const e = new Ab();
         let i = 0;
-        assert.throw(() => i = e.say(1), "stop");
+        assert.throw(() => (i = e.say(1)), "stop");
         assert.equal(i, 0);
     });
 

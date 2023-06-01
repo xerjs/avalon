@@ -1,15 +1,12 @@
 import { assert } from "chai";
-import { actionOn, actionErr, once, onceOn, sleep, action, actionArr } from "../src";
+import { actionOn, actionErr, once, onceOn, sleep, action, actionArr } from "../../src";
 export { actionOn, actionErr, action, actionArr };
 
 describe("utils Decorator tests", () => {
-
-    require("./utils/action.spec");
+    require("../utils/action.spec");
 
     class Person {
-        constructor(public age: number = 1) {
-
-        }
+        constructor(public age: number = 1) {}
 
         @once(3600)
         say(i: number) {
@@ -31,8 +28,6 @@ describe("utils Decorator tests", () => {
             return `${this.age} say ${i} at ${new Date()}`;
         }
     }
-
-
 
     it("Decorator once", () => {
         const p = new Person();
@@ -81,5 +76,4 @@ describe("utils Decorator tests", () => {
         assert.notEqual(pres, p.say2(33));
         assert.equal(p.say2(33), p.say2(44));
     });
-
 });

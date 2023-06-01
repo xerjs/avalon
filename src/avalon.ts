@@ -31,8 +31,9 @@ export class Avalon implements Ioc {
     }
 
     private fillNamedPool() {
-        for (const [ctr] of this.pool) { // ctr is class
-            const meta: { id: string; } = this.rule.getMetadata(ctr) as any;
+        for (const [ctr] of this.pool) {
+            // ctr is class
+            const meta: { id: string } = this.rule.getMetadata(ctr) as any;
             if (meta?.id && typeof meta.id === "string") {
                 this.namedPool.set(meta.id, ctr);
             }
@@ -55,8 +56,8 @@ export class Avalon implements Ioc {
             let goon = false;
             for (const [ctr, v] of this.pool.entries()) {
                 if (v !== unFill) continue; // 已经初始化过了
-                const pars = paramTypes(ctr).map(fn => this.pool.get(fn));
-                if (pars.every(e => e)) {
+                const pars = paramTypes(ctr).map((fn) => this.pool.get(fn));
+                if (pars.every((e) => e)) {
                     this.pool.set(ctr, new ctr(...pars));
                     goon = true;
                 }
@@ -64,9 +65,7 @@ export class Avalon implements Ioc {
             if (goon === false) {
                 break;
             }
-
-        } while ([...this.pool.values()].filter(e => e).length < this.pool.size);
-
+        } while ([...this.pool.values()].filter((e) => e).length < this.pool.size);
     }
 
     /**
@@ -122,9 +121,10 @@ export class Avalon implements Ioc {
                     assert.ok(type, `miss [${meta.svc}] class `);
                     meta.svc = type;
                 }
-                if (meta.svc) { // 可配置的子类
+                if (meta.svc) {
+                    // 可配置的子类
                     const bases = recProto(meta.svc.prototype);
-                    const exts = bases.find(e => e === ptype.prototype);
+                    const exts = bases.find((e) => e === ptype.prototype);
                     assert.ok(exts, `[class ${meta.svc.name}] not extends [class ${ptype.name}]`);
                 }
                 Object.assign(inst, { [meta.key]: this.pool.get(meta.svc || ptype) });
@@ -134,5 +134,3 @@ export class Avalon implements Ioc {
 }
 
 export const SingleAvalon = new Avalon();
-
-
