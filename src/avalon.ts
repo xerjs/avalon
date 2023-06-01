@@ -1,41 +1,52 @@
 import "reflect-metadata";
 import * as assert from "assert";
-import { ClassType, Ioc, PropertyMeta, ProviderOptions } from "./types";
-import { META_KEY } from "./consts";
-import { designType, MetaRule, paramTypes } from "./utils";
+import { PropertyMeta } from "./types";
+import { MetaUtil } from "./meta";
+import { ClassType, Ioc } from "./meta/type";
 
 const unFill = -1;
+const meta = new MetaUtil("avalon");
 
-export class Avalon implements Ioc {
+export class AvalonContainer implements Ioc {
+    static root = new AvalonContainer();
     private pool: Map<ClassType, any>;
-    private rule: MetaRule;
 
     private namedPool: Map<string, ClassType>;
     constructor() {
-        this.rule = new MetaRule(META_KEY.svc, META_KEY.property);
         const mm = new Map();
         mm.set(Number, 0);
         mm.set(String, "");
         this.pool = mm;
         this.namedPool = new Map();
     }
+
+    private fin = false;
+
+    register<T>(ctr: ClassType<T>): void {
+        this.pool.set(ctr, unFill);
+    }
+
     resolve<T>(constructor: ClassType<T>): T {
+        if (!this.fin) {
+            this.initialize([...this.pool.keys()]);
+        }
         return this.pool.get(constructor);
     }
 
-    initialize<T extends ClassType>(servs: T[]) {
-        this.fillPool(servs, 0);
+    initialize<T extends ClassType>(cls: T[]) {
+        this.fillPool(cls, 0);
         this.createInstances();
         this.fillNamedPool();
         this.injectProperty();
+        this.fin = true;
     }
 
     private fillNamedPool() {
         for (const [ctr] of this.pool) {
             // ctr is class
-            const meta: { id: string } = this.rule.getMetadata(ctr) as any;
-            if (meta?.id && typeof meta.id === "string") {
-                this.namedPool.set(meta.id, ctr);
+            const opt: ProviderOptions = meta.classValue(ctr);
+            if (opt?.id && typeof opt.id === "string") {
+                this.namedPool.set(opt.id, ctr);
             }
         }
     }
@@ -46,7 +57,7 @@ export class Avalon implements Ioc {
 
     private createInstances() {
         for (const ctr of this.pool.keys()) {
-            const fns = paramTypes(ctr);
+            const fns = meta.paramTypes(ctr);
             if (!fns || fns.length === 0) {
                 // 无参数的构造函数
                 this.pool.set(ctr, new ctr());
@@ -56,7 +67,7 @@ export class Avalon implements Ioc {
             let goon = false;
             for (const [ctr, v] of this.pool.entries()) {
                 if (v !== unFill) continue; // 已经初始化过了
-                const pars = paramTypes(ctr).map((fn) => this.pool.get(fn));
+                const pars = meta.paramTypes(ctr).map((dep) => this.pool.get(dep));
                 if (pars.every((e) => e)) {
                     this.pool.set(ctr, new ctr(...pars));
                     goon = true;
@@ -70,29 +81,27 @@ export class Avalon implements Ioc {
 
     /**
      * 填充pool里的key
-     * @param servs
+     * @param cls
      * @param deep
      */
-    private fillPool<T extends ClassType>(servs: T[], deep: number) {
+    private fillPool<T extends ClassType>(cls: T[], deep: number) {
         const deps: ClassType[] = [];
         const size = this.pool.size;
-        for (const ctr of servs) {
+        for (const ctr of cls) {
             this.pool.set(ctr, unFill);
-            const fns = paramTypes(ctr);
+            const fns = meta.paramTypes(ctr);
             if (!fns) continue; // no constructor
             deps.push(...fns); // deps on constructor
 
-            const cfg: ProviderOptions | undefined = this.rule.getMetadata(ctr);
+            const cfg: ProviderOptions | undefined = meta.classValue(ctr);
             if (cfg?.deps) {
                 deps.push(...cfg.deps);
             }
 
-            const mkeys = Reflect.getMetadataKeys(ctr.prototype);
-            for (const mk of mkeys) {
-                const propertyKey = this.rule.propertyKey(mk);
-                if (!propertyKey) continue;
-                const pAttr: PropertyMeta = Reflect.getMetadata(mk, ctr.prototype);
-                if (pAttr.svc && typeof pAttr.svc === "function") {
+            // deps on property
+            for (const mk of meta.propertyKeys(ctr)) {
+                const pAttr: PropertyMeta | undefined = meta.propertyValue(ctr, mk);
+                if (pAttr?.svc && typeof pAttr.svc === "function") {
                     deps.push(pAttr.svc);
                 }
             }
@@ -112,25 +121,38 @@ export class Avalon implements Ioc {
             return [];
         }
         for (const [ctr, inst] of this.pool) {
-            const mkeys = Reflect.getMetadataKeys(ctr.prototype) || [];
-            for (const mk of mkeys) {
-                const meta: PropertyMeta = Reflect.getMetadata(mk, ctr.prototype);
-                const ptype = designType(ctr.prototype, meta.key); // 默认returntype
-                if (typeof meta.svc === "string") {
-                    const type = this.namedPool.get(meta.svc);
-                    assert.ok(type, `miss [${meta.svc}] class `);
-                    meta.svc = type;
+            for (const mk of meta.propertyKeys(ctr)) {
+                const opt: PropertyMeta = meta.propertyValue(ctr.prototype, mk);
+                const propertyType = meta.designType(ctr.prototype, mk); // 默认returntype
+                if (typeof opt.svc === "string") {
+                    const type = this.namedPool.get(opt.svc);
+                    assert.ok(type, `miss [${opt.svc}] class `);
+                    opt.svc = type;
                 }
-                if (meta.svc) {
+                if (opt.svc) {
                     // 可配置的子类
-                    const bases = recProto(meta.svc.prototype);
-                    const exts = bases.find((e) => e === ptype.prototype);
-                    assert.ok(exts, `[class ${meta.svc.name}] not extends [class ${ptype.name}]`);
+                    const bases = recProto(opt.svc.prototype);
+                    const exts = bases.find((e) => e === propertyType.prototype);
+                    assert.ok(exts, `[class ${opt.svc.name}] not extends [class ${propertyType.name}]`);
                 }
-                Object.assign(inst, { [meta.key]: this.pool.get(meta.svc || ptype) });
+                Object.assign(inst, { [opt.key]: this.pool.get(opt.svc || propertyType) });
             }
         }
     }
 }
 
-export const SingleAvalon = new Avalon();
+export interface ProviderOptions {
+    ioc?: Ioc;
+    deps?: ClassType[];
+    id?: string;
+}
+
+export const Provider = meta.classDecorator<ProviderOptions>((opt) => {
+    opt = opt || {};
+    opt.ioc = opt.ioc || AvalonContainer.root;
+    return opt;
+});
+
+export const Inject = meta.propertyDecorator<ClassType | string>((e) => {
+    return { svc: e };
+});

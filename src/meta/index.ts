@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { ClassType } from "../types";
+import { ClassType } from "./type";
 
 export const SYS_META_KEY = {
     type: "design:type",
@@ -35,21 +35,23 @@ export class MetaUtil {
         return this.group + ".ns";
     }
 
-    classDecorator<P>() {
-        return (p: P) => {
+    classDecorator<P>(before?: (x: P) => any) {
+        return (p?: P) => {
+            const v = before?.call(null, p!) || p;
             const decorator: ClassDecorator = (target: Function) => {
-                Reflect.defineMetadata(this.svcKey, p, target);
+                Reflect.defineMetadata(this.svcKey, v, target);
             };
             return decorator;
         };
     }
 
-    propertyDecorator<P>() {
-        return (p: P) => {
+    propertyDecorator<P>(before?: (x: P) => any) {
+        return (p?: P) => {
             const decorator: PropertyDecorator = (target: Object, key: PropertyKey) => {
                 // target 指向 class.prototype
                 this.setUniqPro(target, key);
-                Reflect.defineMetadata(this.proKey, p, target, key);
+                const v = before?.call(null, p!) || p;
+                Reflect.defineMetadata(this.proKey, v, target, key);
             };
             return decorator;
         };
@@ -68,9 +70,9 @@ export class MetaUtil {
         return Reflect.getMetadata(SYS_META_KEY.type, target.prototype || target, key);
     }
 
-    propertyKeys(target: Function) {
+    propertyKeys(target: Function): string[] {
         const values = Reflect.getMetadata(this.proName, target.prototype || target);
-        return [...values];
+        return values ? [...values] : [];
     }
 
     manyClassDecorator<P>() {

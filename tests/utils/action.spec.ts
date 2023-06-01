@@ -1,6 +1,5 @@
 import { assert } from "chai";
-import { MetaRule } from "../../src";
-import { actionOn, actionErr, action, actionArr } from "../../src/utils";
+import { actionOn, actionErr, action, actionArr, MetaRule } from "../../src/utils/action";
 
 const rule = new MetaRule("test:utils", "act");
 

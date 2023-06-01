@@ -1,6 +1,6 @@
 import { assert } from "chai";
-import { actionOn, actionErr, once, onceOn, sleep, action, actionArr } from "../../src";
-export { actionOn, actionErr, action, actionArr };
+import { once, onceOn } from "../../src/utils/action";
+import { sleep } from "../../src/utils";
 
 describe("utils Decorator tests", () => {
     require("../utils/action.spec");

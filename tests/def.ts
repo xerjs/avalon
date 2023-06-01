@@ -1,6 +1,6 @@
-import { Provider, Inject, Avalon } from "../src";
+import { Provider, Inject, AvalonContainer } from "../src";
 
-export const avalon = new Avalon();
+export const avalon = new AvalonContainer();
 
 const cfgVal = require("./cfg.json");
 
@@ -21,9 +21,7 @@ export class Config implements Cfg {
 
 @Provider()
 export class DataBase {
-    constructor(public config: Config) {
-
-    }
+    constructor(public config: Config) {}
 
     init() {
         console.log(this.config.url);
@@ -34,19 +32,13 @@ export class DataBase {
     }
 }
 
-export class ImpCfg extends Config {
-
-}
+export class ImpCfg extends Config {}
 @Provider({ id: "ImpImpCfg" })
-export class ImpImpCfg extends ImpCfg {
-
-}
+export class ImpImpCfg extends ImpCfg {}
 
 @Provider({ deps: [ImpImpCfg] })
 export class Serve {
-    constructor(public db: DataBase) {
-
-    }
+    constructor(public db: DataBase) {}
 
     @Inject()
     config!: Config;
@@ -74,4 +66,3 @@ export class Serve2 extends Serve {
         super(db);
     }
 }
-

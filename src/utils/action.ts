@@ -2,11 +2,13 @@
  * method 拦截器 Interceptor
  */
 
-import { ONCE_MKEY, META_KEY } from "../consts";
+export const ONCE_MKEY = {
+    res: "once:res",
+    ttl: "once:ttl",
+};
 
 export class MetaRule {
-    constructor(public readonly perfix: string, public readonly key: string) {
-    }
+    constructor(public readonly perfix: string, public readonly key: string) {}
 
     metaKey(propertyKey: string): string {
         return [this.perfix, this.key, propertyKey].join(":");
@@ -91,7 +93,7 @@ export function actionOn(fn: Function): MethodDecorator {
         function newMethod(this: object, ...args: any) {
             fn();
             return apply(this, args);
-        };
+        }
         descriptor.value = newMethod as any;
         return descriptor;
     };
@@ -112,15 +114,14 @@ export function actionErr(fn: (err: Error) => void): MethodDecorator {
             let err!: Error;
             try {
                 res = apply(this, args);
-            }
-            catch (error) {
-                fn(err = error as Error);
+            } catch (error) {
+                fn((err = error as Error));
             }
             if (err) {
                 throw err;
             }
             return res;
-        };
+        }
         descriptor.value = newMethod as any;
         return descriptor;
     };
@@ -151,12 +152,11 @@ export function once(ss: number): MethodDecorator {
             const ttl = Date.now() + ss * 1000;
             Reflect.defineMetadata(metaKey.ttl, ttl, target, pkey);
             return res;
-        };
+        }
         descriptor.value = newMethod as any;
         return descriptor;
     };
 }
-
 
 /**
  * 缓存结果, 多实例分离
@@ -183,7 +183,7 @@ export function onceOn(ss: number): MethodDecorator {
             res = this[mKey.res] = apply(this, args);
             this[mKey.ttl] = Date.now() + ss * 1000;
             return res;
-        };
+        }
         descriptor.value = newMethod as any;
         return descriptor;
     };

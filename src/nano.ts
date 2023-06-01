@@ -1,5 +1,5 @@
 import * as assert from "assert";
-import { shuffArr } from "./utils";
+import { shuffle } from "./utils";
 
 const MAX = parseInt("1".repeat(13), 2);
 
@@ -30,7 +30,7 @@ export class Nano {
     protected items: NaItem[];
     protected cur: number = 0;
     constructor(public instances: number = 16, public skip: number = 0) {
-        const arr = shuffArr(instances);
+        const arr = shuffle(instances);
         this.items = arr.map((i) => new NaItem(i, skip));
     }
 
