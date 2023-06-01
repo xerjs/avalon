@@ -26,10 +26,6 @@ export class AvalonContainer implements Ioc {
     }
 
     resolve<T>(ctr: ClassType<T>): T {
-        let instance = this.pool.get(ctr);
-        if (!instance) {
-            this.initialize([ctr]);
-        }
         return this.recResolve(ctr, 0);
     }
 
@@ -37,11 +33,11 @@ export class AvalonContainer implements Ioc {
         if (deep === 8) {
             throw new Error("recResolve");
         }
-        let instance = this.pool.get(ctr);
 
-        if (instance === unFill) {
-            this.initialize([...this.pool.keys()]);
-            return this.resolve(ctr);
+        let instance = this.pool.get(ctr);
+        if (!instance) {
+            this.initialize([ctr]);
+            return this.recResolve(ctr, deep + 1);
         }
         return instance;
     }
@@ -74,10 +70,10 @@ export class AvalonContainer implements Ioc {
         }
         do {
             let goon = false;
-            for (const [ctr, v] of this.pool.entries()) {
-                if (v !== unFill) continue; // 已经初始化过了
+            for (const [ctr, ins] of this.pool.entries()) {
+                if (ins !== unFill) continue; // 已经初始化过了
                 const pars = meta.paramTypes(ctr).map(dep => this.pool.get(dep));
-                if (pars.every(e => e)) {
+                if (pars.every(e => e !== unFill)) {
                     this.pool.set(ctr, new ctr(...pars));
                     goon = true;
                 }
@@ -94,6 +90,9 @@ export class AvalonContainer implements Ioc {
      * @param deep
      */
     private fillPool<T extends ClassType>(cls: T[], deep: number) {
+        if (deep === 8) {
+            throw new Error("rec fillPool");
+        }
         const deps: ClassType[] = [];
         const size = this.pool.size;
         for (const ctr of cls) {

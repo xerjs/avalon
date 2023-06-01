@@ -4,7 +4,7 @@ import { AvalonContainer } from "../../src";
 
 const avalon = AvalonContainer.root;
 
-describe.only("resolve instance", () => {
+describe("resolve instance", () => {
     it("class", () => {
         assert.ok(avalon.resolve(Serve2));
         const cnf = avalon.resolve(Config);
@@ -13,7 +13,7 @@ describe.only("resolve instance", () => {
         assert.equal(s1.getNum(), i);
     });
 
-    it.skip("Inject property", () => {
+    it("Inject property", () => {
         const s1 = avalon.resolve(Serve);
         assert.ok(s1.config);
         assert.ok(s1.config2);
@@ -25,7 +25,7 @@ describe.only("resolve instance", () => {
         assert.equal(s1.config, s2.config);
     });
 
-    it.skip("Inject property implements", () => {
+    it("Inject property implements", () => {
         const s1 = avalon.resolve(Serve);
         assert.ok(s1);
         assert.ok(s1.cfg);
