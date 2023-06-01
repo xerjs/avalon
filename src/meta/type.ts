@@ -6,5 +6,5 @@ export type Method = (...args: any) => any;
 
 export interface Ioc {
     resolve<T>(ctr: ClassType<T>): T;
-    register<T>(ctr: ClassType<T>): void;
+    register<T>(ctr: ClassType<T>, e: T): void;
 }

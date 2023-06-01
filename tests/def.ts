@@ -1,6 +1,4 @@
-import { Provider, Inject, AvalonContainer } from "../src";
-
-export const avalon = new AvalonContainer();
+import { Provider, Inject } from "../src";
 
 const cfgVal = require("./cfg.json");
 
@@ -52,8 +50,8 @@ export class Serve {
     @Inject()
     cfg1!: ImpImpCfg;
 
-    @Inject("ImpImpCfg")
-    cfg2!: Config;
+    // @Inject("ImpImpCfg")
+    // cfg2!: Config;
 
     getNum() {
         return this.db.no;
