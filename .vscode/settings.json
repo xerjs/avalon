@@ -9,5 +9,6 @@
         "**/Thumbs.db": true
     },
     "prettier.trailingComma": "all",
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "cSpell.words": ["paramtypes", "returntype"]
 }
