@@ -7,33 +7,22 @@
     "node": ">= 16.0.0"
   },
   "dependencies": {
-    "koa": "^2.13.4",
-    "koa-router": "^10.1.1",
-    "reflect-metadata": "^0.1"
-  },
-  "devDependencies": {
-    "@types/chai": "^4.3.1",
-    "@types/koa": "^2.13.4",
-    "@types/koa-router": "^7.4.4",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "^16.11.27",
-    "@typescript-eslint/eslint-plugin": "^5.21.0",
-    "@typescript-eslint/parser": "^5.21.0",
-    "chai": "^4.3.6",
-    "eslint": "^8.14.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-no-null": "^1.0.2",
-    "mocha": "^9.2.2",
-    "nyc": "^15.1.0",
+    "@types/node": "^20.2.5",
+    "reflect-metadata": "^0.1",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3"
   },
+  "devDependencies": {
+    "@types/chai": "^4.3.1",
+    "@types/mocha": "^10.0.1",
+    "chai": "^4.3.6",
+    "mocha": "^10.2.0",
+    "nyc": "^15.1.0"
+  },
   "scripts": {
-    "ts": "ts-node",
-    "build": "tsc -p ./tsconfig-build.json && cp package.json build",
     "bx": "rm -rf build",
     "coverage": "nyc npm run test",
-    "test": "mocha -r ./node_modules/ts-node/register tests/index.ts"
+    "test": "mocha"
   },
   "author": "lusionx",
   "license": "MIT",
