@@ -95,5 +95,27 @@ describe("meta utils", () => {
         assert.deepEqual(tool2.propertyValue(Man, "son"), [{ rss: "sss" }]);
     });
 
-    class Test4Method {}
+    class Test4Method {
+        @Pro1({ res: "get" })
+        say(): number {
+            throw new Error();
+        }
+
+        @Pro1({ res: "put" })
+        fly(a: string, b: number): number {
+            throw new Error();
+        }
+    }
+    it("method meta", () => {
+        assert.deepEqual(tool.propertyValue(Test4Method, "say"), { res: "get" });
+        assert.deepEqual(tool.propertyValue(Test4Method, "fly"), { res: "put" });
+        assert.deepEqual(tool.propertyKeys(Test4Method), ["say", "fly"]);
+
+        assert.equal(typeof tool.propertyType(Test4Method, "say"), "function");
+        assert.equal(tool.propertyType(Test4Method, "say"), Function);
+        assert.equal(tool.returnType(Test4Method, "say"), Number);
+
+        assert.deepEqual(tool.paramTypes(Test4Method, "say"), []);
+        assert.deepEqual(tool.paramTypes(Test4Method, "fly"), [String, Number]);
+    });
 });

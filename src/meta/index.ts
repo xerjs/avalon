@@ -12,14 +12,17 @@ type PropertyKey = string | symbol;
 export class MetaUtil {
     constructor(public readonly group: string) {}
 
-    paramTypes(target: object, propertyKey?: string): ClassType[] {
+    paramTypes(target: Function, propertyKey?: string): ClassType[] {
         if (propertyKey) {
-            return Reflect.getMetadata(SYS_META_KEY.paramtypes, target, propertyKey);
+            return Reflect.getMetadata(SYS_META_KEY.paramtypes, target.prototype || target, propertyKey);
         }
         return Reflect.getMetadata(SYS_META_KEY.paramtypes, target);
     }
     propertyType(target: Function, key: string) {
         return Reflect.getMetadata(SYS_META_KEY.type, target.prototype || target, key);
+    }
+    returnType(target: Function, key: string) {
+        return Reflect.getMetadata(SYS_META_KEY.returntype, target.prototype || target, key);
     }
 
     get svcKey() {
@@ -48,6 +51,17 @@ export class MetaUtil {
         return (p?: P) => {
             const decorator: PropertyDecorator = (target: Object, key: PropertyKey) => {
                 // target 指向 class.prototype
+                this.setUniqPro(target, key);
+                const v = before?.call(null, p!) || p;
+                Reflect.defineMetadata(this.proKey, v, target, key);
+            };
+            return decorator;
+        };
+    }
+
+    methodDecorator<P>(before?: (x: P) => any) {
+        return (p?: P) => {
+            const decorator: MethodDecorator = (target: Object, key: PropertyKey) => {
                 this.setUniqPro(target, key);
                 const v = before?.call(null, p!) || p;
                 Reflect.defineMetadata(this.proKey, v, target, key);
