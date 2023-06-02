@@ -8,8 +8,6 @@
         "**/.DS_Store": true,
         "**/Thumbs.db": true
     },
-    "prettier.trailingComma": "all",
-    "prettier.printWidth": 160,
     "typescript.tsdk": "node_modules/typescript/lib",
     "cSpell.words": ["paramtypes", "returntype"]
 }
