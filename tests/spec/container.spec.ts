@@ -63,4 +63,26 @@ describe("AvalonContainer", () => {
         assert.ok(ins.ser1 instanceof Ser1);
         assert.ok(ins.ser1.conf instanceof Conf);
     });
+
+    @Provider({ ioc: avalon })
+    class Ser4 {
+        constructor(public name: string, public age: number) {}
+    }
+
+    it("method=resolve;constructor=default", () => {
+        const ins = avalon.resolve(Ser4);
+        assert.ok(ins);
+        assert.equal(ins.age, 0);
+        assert.equal(ins.name, "");
+    });
+
+    class Ser5 {
+        constructor() {}
+    }
+    it("method=register;input=Symbol", () => {
+        const orig = Symbol();
+        avalon.register(Ser5, orig);
+        const ins = avalon.resolve(Ser5);
+        assert.equal(ins, orig);
+    });
 });

@@ -28,7 +28,7 @@ export class AvalonContainer implements Ioc {
         return this.recResolve(ctr, 0);
     }
 
-    recResolve<T>(ctr: ClassType<T>, deep: number): T {
+    protected recResolve<T>(ctr: ClassType<T>, deep: number): T {
         if (deep === 8) {
             throw new Error("recResolve");
         }
