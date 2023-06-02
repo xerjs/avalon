@@ -84,5 +84,13 @@ describe("AvalonContainer", () => {
         avalon.register(Ser5, orig);
         const ins = avalon.resolve(Ser5);
         assert.equal(ins, orig);
+
+        function Some() {
+            const a = 1;
+            return { a };
+        }
+        avalon.register(Some, Some());
+
+        assert.deepEqual(avalon.resolve(Some), { a: 1 });
     });
 });

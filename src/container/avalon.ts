@@ -20,10 +20,12 @@ export class AvalonContainer implements Ioc {
         this.namedPool = new Map();
     }
 
+    register(ctr: Function, instance: unknown): void;
     register<T>(ctr: ClassType<T>, instance: T): void {
         this.pool.set(ctr, instance);
     }
 
+    resolve(ctr: Function): any;
     resolve<T>(ctr: ClassType<T>): T {
         return this.recResolve(ctr, 0);
     }

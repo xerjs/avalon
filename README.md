@@ -1,31 +1,37 @@
-# @xerjs/Avalon
+# @xerjs/avalon
 
-利用`class`本身做`key`的依赖注入容器
+利用`class function`本身做`key`的依赖注入容器
 
-### 初始化
-
-从`initialize`入口, 寻找依赖
-
-- 向上找`constructor`的依赖,
-- Provider`deps`参数
-- 属性类型使用子类
+### 声明 Provider
 
 ```
-@Provider({ id: "xxx", deps: [Config, ImpImpCfg] })
-class Serv extends Some {
-    constructor(public db: DataBase) {
-
-    }
-
-    @Inject("ImpImpCfg")
-    cfg: Config // class ImpImpCfg 需要设置id别名, 并在deps声明
-
-    @Inject(ImpImpCfg)
-    config: Config // 属性类型使用子类实现
+@Provider()
+class DataBase {
 }
 
-avalon.initialize([Serv])
+@Provider()
+class Ser {
+    constructor(public db: DataBase) {
+    }
+}
 
-const svc = avalon.resolve(Serv)
+const svc = AvalonContainer.root.resolve(Ser)
+assert.ok(svc)
+assert.ok(svc.db)
+
+```
+
+实例默认保存在`AvalonContainer.root`里，用 ioc 参数调整存储位置
+
+### 简化闭包
+
+```
+function Some() {
+    const a = 1;
+    return { a };
+}
+avalon.register(Some, Some());
+
+assert.deepEqual(avalon.resolve(Some), { a: 1 });
 
 ```
