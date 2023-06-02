@@ -1,5 +1,5 @@
 import "reflect-metadata";
 
-export * from "./avalon";
+export * from "./container";
 export * from "./utils";
 export * from "./nano";

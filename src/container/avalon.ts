@@ -1,7 +1,7 @@
 import "reflect-metadata";
-import { PropertyMeta } from "./types";
-import { MetaUtil } from "./meta";
-import { ClassType, Ioc } from "./meta/type";
+import { PropertyMeta } from "../types";
+import { MetaUtil } from "../meta";
+import { ClassType, Ioc } from "../meta/type";
 
 const unFill = Symbol();
 const meta = new MetaUtil("avalon");
