@@ -2,7 +2,7 @@
   "name": "@xerjs/avalon",
   "version": "1.0.1",
   "description": "ioc implement",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "engines": {
     "node": ">= 16.0.0"
   },
@@ -23,14 +23,15 @@
     "typescript": "^4.9.3"
   },
   "scripts": {
-    "build": "npx tsc -p tsconfig-build.json & cp package.json README.md build",
+    "build": "npx tsc -p tsconfig-build.json",
+    "pub": "npx tsc -p tsconfig-pub.json",
     "coverage": "nyc npm run test",
     "test": "mocha"
   },
   "author": "lusionx",
   "license": "MIT",
   "files": [
-    "src/"
+    "dist/"
   ],
   "directories": {
     "test": "tests/"
