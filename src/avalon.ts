@@ -1,5 +1,4 @@
 import "reflect-metadata";
-import * as assert from "assert";
 import { PropertyMeta } from "./types";
 import { MetaUtil } from "./meta";
 import { ClassType, Ioc } from "./meta/type";
