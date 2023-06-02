@@ -18,9 +18,8 @@ export class MetaUtil {
         }
         return Reflect.getMetadata(SYS_META_KEY.paramtypes, target);
     }
-
-    designType(target: object, propertyKey: string): ClassType {
-        return Reflect.getMetadata(SYS_META_KEY.type, target, propertyKey);
+    propertyType(target: Function, key: string) {
+        return Reflect.getMetadata(SYS_META_KEY.type, target.prototype || target, key);
     }
 
     get svcKey() {
@@ -66,10 +65,6 @@ export class MetaUtil {
         return Reflect.getMetadata(this.proKey, item, key);
     }
 
-    propertyType(target: Function, key: string) {
-        return Reflect.getMetadata(SYS_META_KEY.type, target.prototype || target, key);
-    }
-
     propertyKeys(target: Function): string[] {
         const values = Reflect.getMetadata(this.proName, target.prototype || target);
         return values ? [...values] : [];
@@ -86,7 +81,7 @@ export class MetaUtil {
         };
     }
 
-    setUniqPro(target: Object, key: PropertyKey) {
+    private setUniqPro(target: Object, key: PropertyKey) {
         const property: Set<PropertyKey> = Reflect.getMetadata(this.proName, target) || new Set();
         property.add(key);
         Reflect.defineMetadata(this.proName, property, target);

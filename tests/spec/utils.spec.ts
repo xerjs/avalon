@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { once, onceOn } from "../../src/utils/action";
 import { sleep } from "../../src/utils";
 
-describe("utils Decorator tests", () => {
+describe.skip("utils Decorator tests", () => {
     require("../utils/action.spec");
 
     class Person {

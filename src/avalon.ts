@@ -72,8 +72,8 @@ export class AvalonContainer implements Ioc {
             let goon = false;
             for (const [ctr, ins] of this.pool.entries()) {
                 if (ins !== unFill) continue; // 已经初始化过了
-                const pars = meta.paramTypes(ctr).map(dep => this.pool.get(dep));
-                if (pars.every(e => e !== unFill)) {
+                const pars = meta.paramTypes(ctr).map((dep) => this.pool.get(dep));
+                if (pars.every((e) => e !== unFill)) {
                     this.pool.set(ctr, new ctr(...pars));
                     goon = true;
                 }
@@ -81,7 +81,7 @@ export class AvalonContainer implements Ioc {
             if (goon === false) {
                 break;
             }
-        } while ([...this.pool.values()].filter(e => e).length < this.pool.size);
+        } while ([...this.pool.values()].filter((e) => e).length < this.pool.size);
     }
 
     /**
@@ -134,7 +134,7 @@ export class AvalonContainer implements Ioc {
         for (const [ctr, inst] of this.pool) {
             for (const mk of meta.propertyKeys(ctr)) {
                 const opt: PropertyMeta = meta.propertyValue(ctr.prototype, mk);
-                const propertyType = meta.designType(ctr.prototype, mk);
+                const propertyType = meta.propertyType(ctr.prototype, mk);
                 // if (typeof opt.svc === "string") {
                 //     const type = this.namedPool.get(opt.svc);
                 //     assert.ok(type, `miss [${opt.svc}] class `);
@@ -163,12 +163,12 @@ export interface ProviderOptions {
     id?: string;
 }
 
-export const Provider = meta.classDecorator<ProviderOptions>(opt => {
+export const Provider = meta.classDecorator<ProviderOptions>((opt) => {
     opt = opt || {};
     opt.ioc = opt.ioc || AvalonContainer.root;
     return opt;
 });
 
-export const Inject = meta.propertyDecorator<ClassType | string>(e => {
+export const Inject = meta.propertyDecorator<ClassType | string>((e) => {
     return { svc: e };
 });
