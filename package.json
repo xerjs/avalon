@@ -23,7 +23,7 @@
     "typescript": "^4.9.3"
   },
   "scripts": {
-    "bx": "rm -rf build",
+    "build": "npx tsc -p tsconfig-build.json & cp package.json README.md build",
     "coverage": "nyc npm run test",
     "test": "mocha"
   },
