@@ -89,8 +89,8 @@ describe("AvalonContainer", () => {
             const a = 1;
             return { a };
         }
-        avalon.register(Some, Some());
+        avalon.registerFun(Some, Some());
 
-        assert.deepEqual(avalon.resolve(Some), { a: 1 });
+        assert.deepEqual(avalon.resolveFun(Some), { a: 1 });
     });
 });

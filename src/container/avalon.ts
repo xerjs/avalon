@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { PropertyMeta } from "../types";
 import { MetaUtil } from "../meta";
-import { ClassType, Ioc } from "../meta/type";
+import { AnyFunc, ClassType, Ioc } from "../meta/type";
 
 const unFill = Symbol();
 const meta = new MetaUtil("avalon");
@@ -20,14 +20,19 @@ export class AvalonContainer implements Ioc {
         this.namedPool = new Map();
     }
 
-    register(ctr: Function, instance: unknown): void;
+    registerFun<T>(fun: AnyFunc<T>, instance: unknown): void {
+        this.pool.set(fun as any, instance);
+    }
     register<T>(ctr: ClassType<T>, instance: T): void {
         this.pool.set(ctr, instance);
     }
 
-    resolve(ctr: Function): any;
     resolve<T>(ctr: ClassType<T>): T {
         return this.recResolve(ctr, 0);
+    }
+
+    resolveFun<T>(fun: AnyFunc<T>): T {
+        return this.pool.get(fun as any);
     }
 
     protected recResolve<T>(ctr: ClassType<T>, deep: number): T {
