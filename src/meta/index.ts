@@ -1,3 +1,4 @@
 import "reflect-metadata";
 
-export { MetaUtil } from "./util";
+export * from "./util";
+export * from "./type";
